@@ -29,9 +29,11 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.nio.file.Paths;
 import java.sql.SQLOutput;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class Main extends Application {
 
@@ -64,17 +66,25 @@ public class Main extends Application {
             Runnable frameGrabber = () -> {
                 Mat frame = grabFrame();
                 MatOfRect rects = getDetectedEyes(frame);
+                rects = filterDetection(rects);
                 drawRects(rects.toArray(), frame);
                 Image imageToShow = mat2Image(frame);
                 Platform.runLater(() -> view.imageProperty().set(imageToShow));
             };
 
-            timer.scheduleAtFixedRate(frameGrabber, 0, 33, TimeUnit.MILLISECONDS);
+            timer.scheduleAtFixedRate(frameGrabber, 0, 120, TimeUnit.MILLISECONDS);
 
         }
 
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private MatOfRect filterDetection(MatOfRect rects){
+        List<Rect> list = rects.toList().stream().filter(x -> x.height < 100 && x.width < 100).collect(Collectors.toList());
+        MatOfRect result = new MatOfRect();
+        result.fromList(list);
+        return result;
     }
 
     private MatOfRect getDetectedEyes(Mat frame){
