@@ -52,14 +52,19 @@ public class Utils {
     }
 
     public static void drawRects(Rect[] rects, Mat frame){
+        drawRects(rects, frame, 2);
+    }
+
+    public static void drawRects(Rect[] rects, Mat frame, int thickness){
         for(Rect rect : rects)
             Imgproc.rectangle(frame, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height),
-                    new Scalar(50, 255, 50),2);
+                    new Scalar(50, 255, 50),thickness);
+
     }
 
     public static boolean isInRect(Rect outer, Rect inner){
-        return outer.contains(new Point(inner.x, inner.y)) && inner.x + outer.x + inner.width < outer.width
-                && inner.y + outer.y + inner.height < outer.height;
+        return outer.contains(new Point(inner.x, inner.y)) && inner.x - outer.x + inner.width < outer.width
+                && inner.y - outer.y + inner.height < outer.height;
     }
 
 

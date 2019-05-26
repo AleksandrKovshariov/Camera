@@ -1,3 +1,4 @@
+import detection.Detector;
 import javafx.scene.layout.AnchorPane;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -23,13 +24,16 @@ public class Main extends Application {
     static{ System.loadLibrary(Core.NATIVE_LIBRARY_NAME); }
 
     private VideoCapture capture = new VideoCapture();
-    private static final int cameraId = 0;
-    private static final int color = Imgproc.COLOR_BGR2GRAY;
+    private static final int CAMERA_ID = 0;
+    private static final int COLOR = Imgproc.COLOR_BGR2GRAY;
+    private static final CascadeClassifier eye = new CascadeClassifier(Paths.get("haarcascade_eye.xml").toString());
+    private static final CascadeClassifier face = new CascadeClassifier(Paths.get("haarcascade_frontalface_default.xml").toString());
+    private static final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
+    private static final Detector eyeDector = new Detector(eye);
+    private static final Detector faceDector = new Detector(face);
 
-    private ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
-    private CascadeClassifier eye = new CascadeClassifier(Paths.get("haarcascade_eye.xml").toString());
-    private CascadeClassifier face = new CascadeClassifier(Paths.get("haarcascade_frontalface_default.xml").toString());
     private ImageView view = new ImageView();
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -41,7 +45,7 @@ public class Main extends Application {
         AnchorPane pane = new AnchorPane();
         Scene scene = new Scene(pane, 650, 600);
         System.out.println("Opening camera");
-        this.capture.open(cameraId);
+        this.capture.open(CAMERA_ID);
         System.out.println("Camera is open");
 
         pane.getChildren().add(view);
@@ -50,10 +54,10 @@ public class Main extends Application {
 
             Runnable frameGrabber = () -> {
                 Mat frame = grabFrame();
-                MatOfRect faceRects = detect(frame, face);
-                MatOfRect eyesRects = detectEyes(frame, faceRects);
+                MatOfRect faceRects = faceDector.detect(frame);
+                MatOfRect eyesRects = eyeDector.detect(frame, faceRects);
                 Utils.drawRects(eyesRects.toArray(), frame);
-                Utils.drawRects(faceRects.toArray(), frame);
+                Utils.drawRects(faceRects.toArray(), frame, 8);
                 Image imageToShow = Utils.mat2Image(frame);
                 Platform.runLater(() -> view.imageProperty().set(imageToShow));
             };
@@ -64,27 +68,6 @@ public class Main extends Application {
 
         primaryStage.setScene(scene);
         primaryStage.show();
-    }
-
-
-    private MatOfRect detectEyes(Mat frame, MatOfRect rect){
-        MatOfRect eyes = new MatOfRect();
-        eye.detectMultiScale(frame, eyes);
-        List<Rect> eyesList = eyes.toList();
-
-        for(Rect r : rect.toArray()){
-            eyesList = eyesList.stream().filter(x -> r.contains(new Point(x.x, x.y))).collect(Collectors.toList());
-        }
-
-        MatOfRect result = new MatOfRect();
-        result.fromList(eyesList);
-        return  result;
-    }
-
-    private MatOfRect detect(Mat frame, CascadeClassifier classifier){
-        MatOfRect eyes = new MatOfRect();
-        classifier.detectMultiScale(frame, eyes);
-        return eyes;
     }
 
     private Mat grabFrame()
@@ -104,7 +87,7 @@ public class Main extends Application {
                 // if the frame is not empty, process it
                 if (!frame.empty())
                 {
-                    Imgproc.cvtColor(frame, frame, color);
+                    Imgproc.cvtColor(frame, frame, COLOR);
                 }
                 else {
                     System.out.println("Frame empty");
