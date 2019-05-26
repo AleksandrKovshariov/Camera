@@ -43,6 +43,7 @@ public class Main extends Application {
     private int cameraId = 0;
     private ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
     private CascadeClassifier eye = new CascadeClassifier(Paths.get("haarcascade_eye.xml").toString());
+    private CascadeClassifier face = new CascadeClassifier(Paths.get("haarcascade_frontalface_default.xml").toString());
     private int cvt = Imgproc.COLOR_BGR2GRAY;
     private ImageView view = new ImageView();
     public static void main(String[] args) {
@@ -65,9 +66,10 @@ public class Main extends Application {
 
             Runnable frameGrabber = () -> {
                 Mat frame = grabFrame();
-                MatOfRect rects = getDetectedEyes(frame);
-                rects = filterDetection(rects);
-                drawRects(rects.toArray(), frame);
+                MatOfRect faceRects = detect(frame, face);
+                MatOfRect eyesRects = detectEyes(frame, faceRects);
+                drawRects(eyesRects.toArray(), frame);
+                drawRects(faceRects.toArray(), frame);
                 Image imageToShow = mat2Image(frame);
                 Platform.runLater(() -> view.imageProperty().set(imageToShow));
             };
@@ -80,16 +82,28 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    private MatOfRect filterDetection(MatOfRect rects){
-        List<Rect> list = rects.toList().stream().filter(x -> x.height < 100 && x.width < 100).collect(Collectors.toList());
-        MatOfRect result = new MatOfRect();
-        result.fromList(list);
-        return result;
+    private boolean isInRect(Rect outer, Rect inner){
+        return outer.contains(new Point(inner.x, inner.y)) && inner.x + outer.x + inner.width < outer.width
+                && inner.y + outer.y + inner.height < outer.height;
     }
 
-    private MatOfRect getDetectedEyes(Mat frame){
+    private MatOfRect detectEyes(Mat frame, MatOfRect rect){
         MatOfRect eyes = new MatOfRect();
         eye.detectMultiScale(frame, eyes);
+        List<Rect> eyesList = eyes.toList();
+
+        for(Rect r : rect.toArray()){
+            eyesList = eyesList.stream().filter(x -> r.contains(new Point(x.x, x.y))).collect(Collectors.toList());
+        }
+
+        MatOfRect result = new MatOfRect();
+        result.fromList(eyesList);
+        return  result;
+    }
+
+    private MatOfRect detect(Mat frame, CascadeClassifier classifier){
+        MatOfRect eyes = new MatOfRect();
+        classifier.detectMultiScale(frame, eyes);
         return eyes;
     }
 
