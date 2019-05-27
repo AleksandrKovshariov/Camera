@@ -24,4 +24,15 @@ public enum LinuxMonitor implements Screen{
             System.out.println(e);
         }
     }
+
+    @Override
+    public void setBrightness(double value) {
+        try {
+            runtime.exec("xrandr --output eDP-1-1 --brightness " + value);
+        }catch (Exception e){
+            System.out.println(e);
+        }
+    }
+
+
 }

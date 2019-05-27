@@ -72,6 +72,7 @@ public class Main extends Application {
                         monitor.turnOff();
                     }
                 }else{
+                    monitor.setBrightness(0.7);
                     counter = 0;
                     monitor.turnOn();
                 }
