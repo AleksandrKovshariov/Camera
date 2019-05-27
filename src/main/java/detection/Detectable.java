@@ -12,10 +12,14 @@ import java.util.stream.Collectors;
 public interface Detectable {
     default MatOfRect detect(Mat frame, MatOfRect areas){
         MatOfRect inners = detect(frame);
-        List<Rect> result = inners.toList();
+        List<Rect> result = new ArrayList<>();
 
-        for(Rect outer : areas.toArray()) {
-            result = result.stream().filter(x -> Utils.isInRect(outer, x)).collect(Collectors.toList());
+        for (Rect inner : inners.toArray()) {
+            for (Rect outer : areas.toArray()) {
+                if (Utils.isInRect(outer, inner)) {
+                    result.add(inner);
+                }
+            }
         }
 
         MatOfRect res = new MatOfRect();

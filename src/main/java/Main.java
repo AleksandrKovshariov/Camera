@@ -1,6 +1,3 @@
-import com.sun.jna.Native;
-import com.sun.jna.platform.win32.WinDef;
-import com.sun.jna.platform.win32.WinUser;
 import detection.Detector;
 import javafx.scene.layout.AnchorPane;
 import javafx.application.Application;
@@ -13,10 +10,12 @@ import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.videoio.VideoCapture;
-import screen.Monitor;
-import screen.User32;
+import screen.LinuxMonitor;
+import screen.Screen;
+import screen.WindowsMonitor;
 import utils.Utils;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -25,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Main extends Application {
 
-    static{ System.loadLibrary(Core.NATIVE_LIBRARY_NAME); }
+    static{ nu.pattern.OpenCV.loadShared();}
 
     private VideoCapture capture = new VideoCapture();
     private static final int CAMERA_ID = 0;
@@ -35,13 +34,15 @@ public class Main extends Application {
     private static final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
     private static final Detector eyeDetector = new Detector(eye);
     private static final Detector faceDetector = new Detector(face);
-    private static final Monitor monitor = Monitor.INSTANCE;
+    private static final Screen monitor = LinuxMonitor.INSTANCE;
 
     private ImageView view = new ImageView();
 
     public static void main(String[] args) {
         launch(args);
     }
+
+    private static int counter = 0;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -56,6 +57,7 @@ public class Main extends Application {
 
         pane.getChildren().add(view);
 
+
         if(this.capture.isOpened()){
 
             Runnable frameGrabber = () -> {
@@ -63,9 +65,15 @@ public class Main extends Application {
                 MatOfRect faceRects = faceDetector.detect(frame);
                 MatOfRect eyesRects = eyeDetector.detect(frame, faceRects);
 
-                if(eyesRects.empty()){
-                    System.out.println("EMPTY");
+                if(eyesRects.toArray().length < 2){
+                    counter++;
+                    System.out.println(counter);
+                    if(counter == 8) {
+                        monitor.turnOff();
+                    }
                 }else{
+                    counter = 0;
+                    monitor.turnOn();
                 }
 
                 Utils.drawRects(eyesRects.toArray(), frame);
@@ -75,7 +83,7 @@ public class Main extends Application {
                 Platform.runLater(() -> view.imageProperty().set(imageToShow));
             };
 
-            timer.scheduleAtFixedRate(frameGrabber, 0, 300, TimeUnit.MILLISECONDS);
+            timer.scheduleAtFixedRate(frameGrabber, 0, 50, TimeUnit.MILLISECONDS);
 
         }
 
