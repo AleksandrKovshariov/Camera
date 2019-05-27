@@ -1,3 +1,6 @@
+import com.sun.jna.Native;
+import com.sun.jna.platform.win32.WinDef;
+import com.sun.jna.platform.win32.WinUser;
 import detection.Detector;
 import javafx.scene.layout.AnchorPane;
 import javafx.application.Application;
@@ -10,14 +13,15 @@ import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.videoio.VideoCapture;
+import screen.Monitor;
+import screen.User32;
 import utils.Utils;
 
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+
 
 public class Main extends Application {
 
@@ -29,8 +33,9 @@ public class Main extends Application {
     private static final CascadeClassifier eye = new CascadeClassifier(Paths.get("haarcascade_eye.xml").toString());
     private static final CascadeClassifier face = new CascadeClassifier(Paths.get("haarcascade_frontalface_default.xml").toString());
     private static final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
-    private static final Detector eyeDector = new Detector(eye);
-    private static final Detector faceDector = new Detector(face);
+    private static final Detector eyeDetector = new Detector(eye);
+    private static final Detector faceDetector = new Detector(face);
+    private static final Monitor monitor = Monitor.INSTANCE;
 
     private ImageView view = new ImageView();
 
@@ -45,6 +50,7 @@ public class Main extends Application {
         AnchorPane pane = new AnchorPane();
         Scene scene = new Scene(pane, 650, 600);
         System.out.println("Opening camera");
+
         this.capture.open(CAMERA_ID);
         System.out.println("Camera is open");
 
@@ -54,15 +60,22 @@ public class Main extends Application {
 
             Runnable frameGrabber = () -> {
                 Mat frame = grabFrame();
-                MatOfRect faceRects = faceDector.detect(frame);
-                MatOfRect eyesRects = eyeDector.detect(frame, faceRects);
+                MatOfRect faceRects = faceDetector.detect(frame);
+                MatOfRect eyesRects = eyeDetector.detect(frame, faceRects);
+
+                if(eyesRects.empty()){
+                    System.out.println("EMPTY");
+                }else{
+                }
+
                 Utils.drawRects(eyesRects.toArray(), frame);
                 Utils.drawRects(faceRects.toArray(), frame, 8);
+
                 Image imageToShow = Utils.mat2Image(frame);
                 Platform.runLater(() -> view.imageProperty().set(imageToShow));
             };
 
-            timer.scheduleAtFixedRate(frameGrabber, 0, 120, TimeUnit.MILLISECONDS);
+            timer.scheduleAtFixedRate(frameGrabber, 0, 300, TimeUnit.MILLISECONDS);
 
         }
 
