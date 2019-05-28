@@ -3,7 +3,9 @@ package detection;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Rect;
+import org.opencv.core.Size;
 import org.opencv.objdetect.CascadeClassifier;
+import org.opencv.objdetect.Objdetect;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
