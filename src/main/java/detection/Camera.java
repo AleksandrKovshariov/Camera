@@ -7,6 +7,7 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.videoio.VideoCapture;
 import screen.LinuxMonitor;
+import screen.MonitorController;
 import screen.Screen;
 import utils.Utils;
 
@@ -21,10 +22,9 @@ public class Camera {
     private static final CascadeClassifier face = new CascadeClassifier(Paths.get("haarcascade_frontalface_default.xml").toString());
     private static final Detector eyeDetector = new Detector(eye);
     private static final Detector faceDetector = new Detector(face);
-    private static final Screen monitor = LinuxMonitor.INSTANCE;
 
-    private int counter = 0;
     private VideoCapture capture = new VideoCapture();
+    private MonitorController monitorController = new MonitorController();
 
     public void open(){
         this.capture.open(CAMERA_ID);
@@ -40,16 +40,7 @@ public class Camera {
         MatOfRect faceRects = faceDetector.detect(frame);
         MatOfRect eyesRects = eyeDetector.detect(frame, faceRects);
 
-        if(eyesRects.toArray().length < 2){
-            counter++;
-            System.out.println(counter);
-            if(counter == 8) {
-                monitor.turnOff();
-            }
-        }else{
-            counter = 0;
-            monitor.turnOn();
-        }
+        monitorController.check(eyesRects);
 
         Utils.drawRects(eyesRects.toArray(), frame);
         Utils.drawRects(faceRects.toArray(), frame, 8);
