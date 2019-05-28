@@ -1,4 +1,6 @@
 import detection.Camera;
+import detection.Detector;
+import detection.EyesInFaceDetector;
 import javafx.scene.layout.AnchorPane;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -21,6 +23,7 @@ public class Main extends Application {
     private ImageView view = new ImageView();
     private static final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
     private static final Camera camera = new Camera();
+    private static final EyesInFaceDetector detector = new EyesInFaceDetector();
     private MonitorController monitorController = new MonitorController();
 
     public static void main(String[] args) {
@@ -49,12 +52,10 @@ public class Main extends Application {
 
     public void processFrame(){
         Mat frame = camera.grabFrame();
-        MatOfRect faceRects = camera.detectFace(frame);
-        MatOfRect eyesRects = camera.detectEyes(frame, faceRects);
+        MatOfRect faceRects = detector.detectFace(frame);
+        MatOfRect eyesRects = detector.detectEyes(frame, faceRects);
 
-        monitorController.check(eyesRects);
-
-        Image image = camera.draw(frame, faceRects, eyesRects);
+        Image image = camera.drawRects(frame, faceRects, eyesRects);
         Platform.runLater(() -> view.imageProperty().set(image));
     }
 
