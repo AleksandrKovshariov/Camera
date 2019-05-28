@@ -1,8 +1,5 @@
 package screen;
 
-import jdk.internal.util.xml.impl.Input;
-
-import java.io.InputStream;
 
 public enum LinuxMonitor implements Screen{
     INSTANCE;
@@ -12,7 +9,7 @@ public enum LinuxMonitor implements Screen{
         try {
             runtime.exec("xset dpms force on");
         }catch (Exception e){
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
@@ -21,7 +18,7 @@ public enum LinuxMonitor implements Screen{
         try {
             runtime.exec("xset dpms force off");
         }catch (Exception e){
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
@@ -30,7 +27,7 @@ public enum LinuxMonitor implements Screen{
         try {
             runtime.exec("xrandr --output eDP-1-1 --brightness " + value);
         }catch (Exception e){
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 

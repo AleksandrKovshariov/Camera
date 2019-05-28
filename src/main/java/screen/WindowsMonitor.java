@@ -22,7 +22,7 @@ public enum WindowsMonitor implements Screen
 
     @Override
     public void setBrightness(double value) {
-        
+
     }
 
 

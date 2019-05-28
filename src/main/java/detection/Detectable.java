@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public interface Detectable {
+    //No need for method
     default MatOfRect detect(Mat frame, MatOfRect areas){
         MatOfRect inners = detect(frame);
         List<Rect> result = new ArrayList<>();

@@ -1,6 +1,5 @@
 package detection;
 
-import javafx.application.Platform;
 import javafx.scene.image.Image;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
@@ -12,14 +11,11 @@ import screen.Screen;
 import utils.Utils;
 
 import java.nio.file.Paths;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+
 
 public class Camera {
-    private VideoCapture capture = new VideoCapture();
-    private static final int CAMERA_ID = 0;
-    private static final int COLOR = Imgproc.COLOR_BGR2GRAY;
+    public static final int CAMERA_ID = 0;
+    public static final int COLOR = Imgproc.COLOR_BGR2GRAY;
 
     private static final CascadeClassifier eye = new CascadeClassifier(Paths.get("haarcascade_eye.xml").toString());
     private static final CascadeClassifier face = new CascadeClassifier(Paths.get("haarcascade_frontalface_default.xml").toString());
@@ -27,7 +23,8 @@ public class Camera {
     private static final Detector faceDetector = new Detector(face);
     private static final Screen monitor = LinuxMonitor.INSTANCE;
 
-    private static int counter = 0;
+    private int counter = 0;
+    private VideoCapture capture = new VideoCapture();
 
     public void open(){
         this.capture.open(CAMERA_ID);
