@@ -3,6 +3,7 @@ package detection;
 import javafx.scene.image.Image;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
+import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.videoio.VideoCapture;
@@ -12,6 +13,8 @@ import screen.Screen;
 import utils.Utils;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Camera {
@@ -38,7 +41,19 @@ public class Camera {
 
         Mat frame = grabFrame();
         MatOfRect faceRects = faceDetector.detect(frame);
-        MatOfRect eyesRects = eyeDetector.detect(frame, faceRects);
+        MatOfRect eyesRects = new MatOfRect();
+        List<Rect> eyeList = new ArrayList<>();
+
+        for(Rect r : faceRects.toArray()){
+            MatOfRect rects = eyeDetector.detect(frame.submat(r));
+            List<Rect> temp = rects.toList();
+            temp.forEach(x -> {
+                x.x += r.x;
+                x.y += r.y;
+            });
+            eyeList.addAll(temp);
+        }
+        eyesRects.fromList(eyeList);
 
         monitorController.check(eyesRects);
 

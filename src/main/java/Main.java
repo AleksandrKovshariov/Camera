@@ -29,7 +29,7 @@ public class Main extends Application {
 
     private ImageView view = new ImageView();
     private static final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
-    private static Camera camera = new Camera();
+    private static final Camera camera = new Camera();
 
     public static void main(String[] args) {
         launch(args);
