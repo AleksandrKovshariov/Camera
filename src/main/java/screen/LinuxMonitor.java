@@ -22,6 +22,7 @@ public enum LinuxMonitor implements Screen{
         }
     }
 
+    //for refactoring
     @Override
     public void setBrightness(double value) {
         try {

@@ -4,7 +4,11 @@ import org.opencv.core.MatOfRect;
 
 public class MonitorController {
     private long counter = 0;
-    private static final Screen monitor = LinuxMonitor.INSTANCE;
+    private Screen monitor;
+
+    public MonitorController(Screen monitor){
+        this.monitor = monitor;
+    }
 
     public void check(MatOfRect rects){
         if(rects.toArray().length < 2){

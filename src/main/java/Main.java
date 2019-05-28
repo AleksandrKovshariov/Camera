@@ -9,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import org.opencv.core.*;
+import screen.LinuxMonitor;
 import screen.MonitorController;
 
 import java.util.concurrent.Executors;
@@ -24,7 +25,7 @@ public class Main extends Application {
     private static final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
     private static final Camera camera = new Camera();
     private static final EyesInFaceDetector detector = new EyesInFaceDetector();
-    private MonitorController monitorController = new MonitorController();
+    private MonitorController monitorController = new MonitorController(LinuxMonitor.INSTANCE);
 
     public static void main(String[] args) {
         launch(args);
