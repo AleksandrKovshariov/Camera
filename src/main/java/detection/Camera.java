@@ -3,27 +3,32 @@ package detection;
 import javafx.scene.image.Image;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
-import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.videoio.VideoCapture;
-import screen.MonitorController;
 import utils.Utils;
-
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class Camera{
-    public static final int CAMERA_ID = 0;
-    public static final int COLOR = Imgproc.COLOR_BGR2GRAY;
+    private int camera_id;
+    private int color;
 
+    public Camera(int camera_id, int color){
+        this.camera_id = camera_id;
+        this.color = color;
+    }
+
+    public Camera(int camera_id){
+        this(camera_id, Imgproc.COLOR_BGR2GRAY);
+    }
+
+    public Camera(){
+        this(0);
+    }
 
     private VideoCapture capture = new VideoCapture();
 
     public void open(){
-        this.capture.open(CAMERA_ID);
+        this.capture.open(camera_id);
     }
 
     public boolean isOpen(){
@@ -51,7 +56,7 @@ public class Camera{
 
                 if (!frame.empty())
                 {
-                    Imgproc.cvtColor(frame, frame, COLOR);
+                    Imgproc.cvtColor(frame, frame, color);
                 }
                 else {
                     System.out.println("Frame empty");
