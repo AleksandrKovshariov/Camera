@@ -7,9 +7,7 @@ import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.videoio.VideoCapture;
-import screen.LinuxMonitor;
 import screen.MonitorController;
-import screen.Screen;
 import utils.Utils;
 
 import java.nio.file.Paths;
@@ -41,10 +39,21 @@ public class Camera {
 
         Mat frame = grabFrame();
         MatOfRect faceRects = faceDetector.detect(frame);
+        MatOfRect eyesRects = detectEyes(frame, faceRects);
+
+        monitorController.check(eyesRects);
+
+        Utils.drawRects(eyesRects.toArray(), frame);
+        Utils.drawRects(faceRects.toArray(), frame, 8);
+
+        return Utils.mat2Image(frame);
+    }
+
+    private MatOfRect detectEyes(Mat frame, MatOfRect face){
         MatOfRect eyesRects = new MatOfRect();
         List<Rect> eyeList = new ArrayList<>();
 
-        for(Rect r : faceRects.toArray()){
+        for(Rect r : face.toArray()){
             MatOfRect rects = eyeDetector.detect(frame.submat(r));
             List<Rect> temp = rects.toList();
             temp.forEach(x -> {
@@ -54,13 +63,7 @@ public class Camera {
             eyeList.addAll(temp);
         }
         eyesRects.fromList(eyeList);
-
-        monitorController.check(eyesRects);
-
-        Utils.drawRects(eyesRects.toArray(), frame);
-        Utils.drawRects(faceRects.toArray(), frame, 8);
-
-        return Utils.mat2Image(frame);
+        return eyesRects;
     }
 
     private Mat grabFrame()
