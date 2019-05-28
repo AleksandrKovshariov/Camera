@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Camera {
+public class Camera implements Detectable {
     public static final int CAMERA_ID = 0;
     public static final int COLOR = Imgproc.COLOR_BGR2GRAY;
 
@@ -25,7 +25,6 @@ public class Camera {
     private static final Detector faceDetector = new Detector(face);
 
     private VideoCapture capture = new VideoCapture();
-    private MonitorController monitorController = new MonitorController();
 
     public void open(){
         this.capture.open(CAMERA_ID);
@@ -35,13 +34,7 @@ public class Camera {
         return capture.isOpened();
     }
 
-    public Image processFrame(){
-
-        Mat frame = grabFrame();
-        MatOfRect faceRects = faceDetector.detect(frame);
-        MatOfRect eyesRects = detectEyes(frame, faceRects);
-
-        monitorController.check(eyesRects);
+    public Image draw(Mat frame, MatOfRect faceRects, MatOfRect eyesRects){
 
         Utils.drawRects(eyesRects.toArray(), frame);
         Utils.drawRects(faceRects.toArray(), frame, 8);
@@ -49,7 +42,16 @@ public class Camera {
         return Utils.mat2Image(frame);
     }
 
-    private MatOfRect detectEyes(Mat frame, MatOfRect face){
+    public MatOfRect detectFace(Mat frame){
+        return faceDetector.detect(frame);
+    }
+
+    @Override
+    public MatOfRect detect(Mat frame){
+        return detectEyes(frame, detectFace(frame));
+    }
+
+    public MatOfRect detectEyes(Mat frame, MatOfRect face){
         MatOfRect eyesRects = new MatOfRect();
         List<Rect> eyeList = new ArrayList<>();
 
@@ -66,7 +68,7 @@ public class Camera {
         return eyesRects;
     }
 
-    private Mat grabFrame()
+    public Mat grabFrame()
     {
         Mat frame = new Mat();
 

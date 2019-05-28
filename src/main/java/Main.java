@@ -1,5 +1,4 @@
 import detection.Camera;
-import detection.Detector;
 import javafx.scene.layout.AnchorPane;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -8,16 +7,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import org.opencv.core.*;
-import org.opencv.imgproc.Imgproc;
-import org.opencv.objdetect.CascadeClassifier;
-import org.opencv.videoio.VideoCapture;
-import screen.LinuxMonitor;
-import screen.Screen;
-import screen.WindowsMonitor;
-import utils.Utils;
+import screen.MonitorController;
 
-import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -30,6 +21,7 @@ public class Main extends Application {
     private ImageView view = new ImageView();
     private static final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
     private static final Camera camera = new Camera();
+    private MonitorController monitorController = new MonitorController();
 
     public static void main(String[] args) {
         launch(args);
@@ -46,7 +38,7 @@ public class Main extends Application {
         camera.open();
 
         if(camera.isOpen()) {
-            timer.scheduleAtFixedRate(this::renderFrame, 0, 60, TimeUnit.MILLISECONDS);
+            timer.scheduleAtFixedRate(this::processFrame, 0, 60, TimeUnit.MILLISECONDS);
         }
 
         pane.getChildren().add(view);
@@ -55,8 +47,14 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    public void renderFrame(){
-        Image image = camera.processFrame();
+    public void processFrame(){
+        Mat frame = camera.grabFrame();
+        MatOfRect faceRects = camera.detectFace(frame);
+        MatOfRect eyesRects = camera.detectEyes(frame, faceRects);
+
+        monitorController.check(eyesRects);
+
+        Image image = camera.draw(frame, faceRects, eyesRects);
         Platform.runLater(() -> view.imageProperty().set(image));
     }
 
