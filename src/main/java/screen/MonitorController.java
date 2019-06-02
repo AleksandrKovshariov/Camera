@@ -15,7 +15,7 @@ public class MonitorController {
             counter++;
             System.out.println(counter);
             if(counter == 8) {
-                monitor.turnOff();
+//                monitor.turnOff();
             }
         }else{
             counter = 0;

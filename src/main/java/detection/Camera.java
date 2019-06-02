@@ -57,7 +57,7 @@ public class Camera{
                 if (!frame.empty())
                 {
                     Imgproc.cvtColor(frame, frame, color);
-                    Imgproc.equalizeHist(frame, frame);
+                    //Imgproc.equalizeHist(frame, frame);
                 }
                 else {
                     System.out.println("Frame empty");

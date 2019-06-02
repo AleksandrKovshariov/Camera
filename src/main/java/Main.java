@@ -42,7 +42,7 @@ public class Main extends Application {
         camera.open();
 
         if(camera.isOpen()) {
-            timer.scheduleAtFixedRate(this::processFrame, 0, 60, TimeUnit.MILLISECONDS);
+            timer.scheduleAtFixedRate(this::processFrame, 0, 120, TimeUnit.MILLISECONDS);
         }
 
         pane.getChildren().add(view);
@@ -55,9 +55,10 @@ public class Main extends Application {
         Mat frame = camera.grabFrame();
         MatOfRect faceRects = detector.detectFace(frame);
         MatOfRect eyesRects = detector.detectEyes(frame, faceRects);
+        monitorController.check(eyesRects);
 
-        Image image = camera.drawRects(frame, faceRects, eyesRects);
-        Platform.runLater(() -> view.imageProperty().set(image));
+//        Image image = camera.drawRects(frame, faceRects, eyesRects);
+//        Platform.runLater(() -> view.imageProperty().set(image));
     }
 
 
