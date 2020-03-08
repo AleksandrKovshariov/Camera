@@ -1,5 +1,4 @@
 import detection.Camera;
-import detection.Detector;
 import detection.EyesInFaceDetector;
 import javafx.scene.layout.AnchorPane;
 import javafx.application.Application;
@@ -9,7 +8,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import org.opencv.core.*;
-import screen.LinuxMonitor;
+import screen.mac.MacOsMonitor;
 import screen.MonitorController;
 
 import java.util.concurrent.Executors;
@@ -19,13 +18,15 @@ import java.util.concurrent.TimeUnit;
 
 public class Main extends Application {
 
-    static{ nu.pattern.OpenCV.loadShared();}
+    static{
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+    }
 
     private ImageView view = new ImageView();
     private static final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
     private static final Camera camera = new Camera();
     private static final EyesInFaceDetector detector = new EyesInFaceDetector();
-    private MonitorController monitorController = new MonitorController(LinuxMonitor.INSTANCE);
+    private MonitorController monitorController = new MonitorController(MacOsMonitor.INSTANCE);
 
     public static void main(String[] args) {
         launch(args);
@@ -57,8 +58,8 @@ public class Main extends Application {
         MatOfRect eyesRects = detector.detectEyes(frame, faceRects);
         monitorController.check(eyesRects);
 
-//        Image image = camera.drawRects(frame, faceRects, eyesRects);
-//        Platform.runLater(() -> view.imageProperty().set(image));
+        Image image = camera.drawRects(frame, faceRects, eyesRects);
+        Platform.runLater(() -> view.imageProperty().set(image));
     }
 
 

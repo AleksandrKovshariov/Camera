@@ -1,7 +1,9 @@
-package screen;
+package screen.linux;
 
 
-public enum LinuxMonitor implements Screen{
+import screen.Screen;
+
+public enum LinuxMonitor implements Screen {
     INSTANCE;
     private Runtime runtime = Runtime.getRuntime();
     @Override

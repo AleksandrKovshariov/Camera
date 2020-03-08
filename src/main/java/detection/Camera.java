@@ -5,7 +5,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
-import utils.Utils;
+import utils.ImageUtils;
 
 
 public class Camera{
@@ -37,10 +37,10 @@ public class Camera{
 
     public Image drawRects(Mat frame, MatOfRect faceRects, MatOfRect eyesRects){
 
-        Utils.drawRects(eyesRects.toArray(), frame);
-        Utils.drawRects(faceRects.toArray(), frame, 8);
+        ImageUtils.drawRects(eyesRects.toArray(), frame);
+        ImageUtils.drawRects(faceRects.toArray(), frame, 8);
 
-        return Utils.mat2Image(frame);
+        return ImageUtils.mat2Image(frame);
     }
 
 

@@ -1,7 +1,8 @@
-package screen;
+package screen.windows;
 
 import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinUser;
+import screen.Screen;
 
 public enum WindowsMonitor implements Screen
 {

@@ -11,9 +11,9 @@ import org.opencv.imgproc.Imgproc;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 
-public class Utils {
+public class ImageUtils {
 
-    private Utils(){
+    private ImageUtils(){
 
     }
 

@@ -11,11 +11,13 @@ public class MonitorController {
     }
 
     public void check(MatOfRect rects){
+        System.out.println("Turning off");
+        monitor.turnOff();
         if(rects.toArray().length < 2){
             counter++;
             System.out.println(counter);
             if(counter == 8) {
-//                monitor.turnOff();
+                monitor.turnOff();
             }
         }else{
             counter = 0;
