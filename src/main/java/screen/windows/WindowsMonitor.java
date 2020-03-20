@@ -27,9 +27,4 @@ public enum WindowsMonitor implements Screen
     }
 
 
-    @Override
-    public boolean isOn() {
-        return isOn;
-    }
-
 }

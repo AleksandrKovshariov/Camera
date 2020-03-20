@@ -8,6 +8,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import org.opencv.core.*;
+import screen.Brightness;
 import screen.mac.MacOsMonitor;
 import screen.MonitorController;
 import org.slf4j.Logger;
@@ -29,7 +30,7 @@ public class Main extends Application {
     private static final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
     private static final Camera camera = new Camera();
     private static final EyesInFaceDetector detector = new EyesInFaceDetector();
-    private MonitorController monitorController = new MonitorController(MacOsMonitor.INSTANCE);
+    private MonitorController monitorController = new MonitorController(new Brightness(0.8, 0.05), MacOsMonitor.INSTANCE);
 
     public static void main(String[] args) {
         launch(args);
