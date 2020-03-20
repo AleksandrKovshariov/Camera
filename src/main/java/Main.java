@@ -10,6 +10,8 @@ import javafx.stage.Stage;
 import org.opencv.core.*;
 import screen.mac.MacOsMonitor;
 import screen.MonitorController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -17,12 +19,13 @@ import java.util.concurrent.TimeUnit;
 
 
 public class Main extends Application {
+    private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     static{
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 
-    private ImageView view = new ImageView();
+    private final ImageView view = new ImageView();
     private static final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
     private static final Camera camera = new Camera();
     private static final EyesInFaceDetector detector = new EyesInFaceDetector();
@@ -36,10 +39,9 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Hello World!");
-
         AnchorPane pane = new AnchorPane();
         Scene scene = new Scene(pane, 650, 600);
-        System.out.println("Opening camera");
+        log.debug("Opening camera");
         camera.open();
 
         if(camera.isOpen()) {
