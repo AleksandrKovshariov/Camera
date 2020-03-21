@@ -4,7 +4,7 @@ import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinUser;
 import screen.Screen;
 
-public enum WindowsMonitor implements Screen
+public enum WindowsScreen implements Screen
 {
     INSTANCE;
     private User32 user = User32.INSTANCE;
@@ -26,10 +26,5 @@ public enum WindowsMonitor implements Screen
 
     }
 
-
-    @Override
-    public boolean isOn() {
-        return isOn;
-    }
 
 }

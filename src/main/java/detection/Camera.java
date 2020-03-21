@@ -1,14 +1,15 @@
 package detection;
 
-import javafx.scene.image.Image;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfRect;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
-import utils.ImageUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import screen.ScreenController;
 
 
 public class Camera{
+    private static final Logger log = LoggerFactory.getLogger(ScreenController.class);
     private int camera_id;
     private int color;
 
@@ -35,38 +36,27 @@ public class Camera{
         return capture.isOpened();
     }
 
-    public Image drawRects(Mat frame, MatOfRect faceRects, MatOfRect eyesRects){
-
-        ImageUtils.drawRects(eyesRects.toArray(), frame);
-        ImageUtils.drawRects(faceRects.toArray(), frame, 8);
-
-        return ImageUtils.mat2Image(frame);
-    }
-
-
     public Mat grabFrame()
     {
         Mat frame = new Mat();
 
         if (this.capture.isOpened())
         {
-            try
-            {
+            try {
                 this.capture.read(frame);
 
                 if (!frame.empty())
                 {
                     Imgproc.cvtColor(frame, frame, color);
-                    //Imgproc.equalizeHist(frame, frame);
+//                    Imgproc.equalizeHist(frame, frame);
                 }
                 else {
-                    System.out.println("Frame empty");
+                    log.error("Frame is empty");
                 }
 
             }
-            catch (Exception e)
-            {
-                System.err.println("Exception during the image elaboration: " + e);
+            catch (Exception e) {
+                log.error("Exception during the image elaboration: " + e);
             }
         }
 

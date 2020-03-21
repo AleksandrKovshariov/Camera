@@ -2,10 +2,7 @@ package utils;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
+import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 
 import java.awt.image.BufferedImage;
@@ -59,7 +56,6 @@ public class ImageUtils {
         for(Rect rect : rects)
             Imgproc.rectangle(frame, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height),
                     new Scalar(50, 255, 50),thickness);
-
     }
 
     public static boolean isInRect(Rect outer, Rect inner){
