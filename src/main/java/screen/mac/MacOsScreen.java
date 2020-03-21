@@ -5,7 +5,7 @@ import screen.Screen;
 import javax.naming.OperationNotSupportedException;
 import java.io.IOException;
 
-public enum MacOsMonitor implements Screen {
+public enum MacOsScreen implements Screen {
     INSTANCE;
     private Runtime runtime = Runtime.getRuntime();
 

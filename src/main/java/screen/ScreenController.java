@@ -4,14 +4,14 @@ import org.opencv.core.MatOfRect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MonitorController {
-    private static final Logger log = LoggerFactory.getLogger(MonitorController.class);
+public class ScreenController {
+    private static final Logger log = LoggerFactory.getLogger(ScreenController.class);
     private Brightness brightness;
 
     private long counter = 0;
     private Screen monitor;
 
-    public MonitorController(Brightness brightness, Screen monitor){
+    public ScreenController(Brightness brightness, Screen monitor){
         this.brightness = brightness;
         this.monitor = monitor;
     }

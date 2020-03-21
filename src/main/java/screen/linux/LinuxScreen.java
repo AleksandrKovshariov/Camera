@@ -3,7 +3,7 @@ package screen.linux;
 
 import screen.Screen;
 
-public enum LinuxMonitor implements Screen {
+public enum LinuxScreen implements Screen {
     INSTANCE;
     private Runtime runtime = Runtime.getRuntime();
     @Override

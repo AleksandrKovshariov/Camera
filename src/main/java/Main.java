@@ -9,10 +9,11 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import org.opencv.core.*;
 import screen.Brightness;
-import screen.mac.MacOsMonitor;
-import screen.MonitorController;
+import screen.mac.MacOsScreen;
+import screen.ScreenController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.ImageUtils;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -27,10 +28,10 @@ public class Main extends Application {
     }
 
     private final ImageView view = new ImageView();
-    private static final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
-    private static final Camera camera = new Camera();
-    private static final EyesInFaceDetector detector = new EyesInFaceDetector();
-    private MonitorController monitorController = new MonitorController(new Brightness(0.8, 0.05), MacOsMonitor.INSTANCE);
+    private static final ScheduledExecutorService TIMER = Executors.newSingleThreadScheduledExecutor();
+    private static final Camera CAMERA = new Camera();
+    private static final EyesInFaceDetector DETECTOR = new EyesInFaceDetector();
+    private ScreenController screenController = new ScreenController(new Brightness(0.8, 0.05), MacOsScreen.INSTANCE);
 
     public static void main(String[] args) {
         launch(args);
@@ -39,14 +40,14 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        primaryStage.setTitle("Hello World!");
+        primaryStage.setTitle("Test");
         AnchorPane pane = new AnchorPane();
-        Scene scene = new Scene(pane, 650, 600);
+        Scene scene = new Scene(pane, 1350, 800);
         log.debug("Opening camera");
-        camera.open();
+        CAMERA.open();
 
-        if(camera.isOpen()) {
-            timer.scheduleAtFixedRate(this::processFrame, 0, 120, TimeUnit.MILLISECONDS);
+        if(CAMERA.isOpen()) {
+            TIMER.scheduleAtFixedRate(this::processFrame, 0, 120, TimeUnit.MILLISECONDS);
         }
 
         pane.getChildren().add(view);
@@ -56,19 +57,23 @@ public class Main extends Application {
     }
 
     public void processFrame(){
-        Mat frame = camera.grabFrame();
-        MatOfRect faceRects = detector.detectFace(frame);
-        MatOfRect eyesRects = detector.detectEyes(frame, faceRects);
-        monitorController.check(eyesRects);
+        Mat frame = CAMERA.grabFrame();
+        MatOfRect faceRects = DETECTOR.detectFace(frame);
+        MatOfRect eyesRects = DETECTOR.detectEyes(frame, faceRects);
+        screenController.check(eyesRects);
 
-        Image image = camera.drawRects(frame, faceRects, eyesRects);
+        ImageUtils.drawRects(faceRects.toArray(), frame, 10);
+        ImageUtils.drawRects(eyesRects.toArray(), frame, 2);
+
+        Image image = ImageUtils.mat2Image(frame);
+
         Platform.runLater(() -> view.imageProperty().set(image));
     }
 
 
     @Override
     public void stop() throws Exception {
-        timer.shutdownNow();
+        TIMER.shutdownNow();
         super.stop();
     }
 }
